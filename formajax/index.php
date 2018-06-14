@@ -21,8 +21,8 @@ if($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
                 'Тема письма'
             /*array(
                 'host' => 'smtp.yandex.ru',
-                'username' => 'kamnegrad.ufa.ru@yandex.ru',
-                'password' => 'aSo04bH2m'
+                'username' => '@yandex.ru',
+                'password' => ''
             )*/
             );
         }
