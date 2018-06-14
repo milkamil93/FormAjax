@@ -17,7 +17,7 @@ if($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
     switch ($_SERVER['REQUEST_METHOD']) {
         case 'POST': {
             echo (new formajax())->send(
-                'kamil@pandaworks.ru',
+                '@yandex.ru',
                 'Тема письма'
             /*array(
                 'host' => 'smtp.yandex.ru',
