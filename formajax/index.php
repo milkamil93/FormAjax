@@ -12,19 +12,20 @@ function not_request($error = null) {
     header('HTTP/1.0 404 Not Found');
     die($error);
 }
-
-if($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'] == 'FormAjaxRequest') {
     switch ($_SERVER['REQUEST_METHOD']) {
         case 'POST': {
             echo (new formajax())->send(
-                '@yandex.ru',
-                'Тема письма'
+                'to@to.to',
+                'Тема письма',
+                'Имя'
             /*array(
                 'host' => 'smtp.yandex.ru',
                 'username' => '@yandex.ru',
                 'password' => ''
             )*/
             );
+            break;
         }
 
         default: {

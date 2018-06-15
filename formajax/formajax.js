@@ -13,8 +13,8 @@
         requestpage: 'Страница с запросом',
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
-        yandexMetrika: function (key) {
-            //yaCounter47027148.reachGoal(key);
+        yandexMetrika: function (TARGET) {
+            //yaCounter47027148.reachGoal(TARGET);
         }
     };
     
@@ -24,6 +24,7 @@
             this.settings = $settings;
             this.typefileds = 'input:not([type="button"]):not([type="hidden"]):not([type="image"]):not([type="password"]):not([type="reset"]):not([type="submit"]),textarea,select';
             this.names = {};
+            this.error = false;
             this.send();
         },
         /* Записать источник трафика */
@@ -44,15 +45,17 @@
                 if ($alert.length) {
                     $alert[0].parentNode.removeChild($alert[0]);
                 }
-                this.form.appendChild(createEl('div','alert alert-' + $status, $text));
+                this.form.insertBefore(createEl('div','alert alert-' + $status, $text), this.form.firstChild);
             }
         },
         /* Вывести ошибку поля */
-        statusField: function ($el, $text) {
-            $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $text + '</div>');
+        statusField: function ($el) {
+            this.error = true;
+            var $msg = $el.getAttribute('data-error') || 'Поле обязательно для выбора';
+            $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $msg + '</div>');
         },
-        /* Функция отправки */
-        send: function () {
+        /* Проверка полей на валидность, подготовка формы к отправке */
+        checkFields: function () {
             var $fields = this.form.querySelectorAll(this.typefileds),
                 $allRequired = this.form.querySelectorAll('[required]').length,
                 $this = this,
@@ -62,13 +65,13 @@
                 };
             $fields.forEach(function ($item) {
                 var $name = $item.getAttribute('name'),
-                    $type = $item.getAttribute('type');                
+                    $type = $item.getAttribute('type');
                 var $next = $item.nextElementSibling;
                 if ($next && is($item.nextElementSibling, '.invalid-feedback')) {
                     $next.parentNode.removeChild($next);
                     removeClass($item, 'is-invalid');
                 }
-                if (!$allRequired || $item.getAttribute('required') !== null) { 
+                if (!$allRequired || $item.getAttribute('required') !== null) {
                     /* Сбор ошибок */
                     switch ($type) {
                         /* Проверка checkbox и radio полей на выбранность */
@@ -79,7 +82,7 @@
                             if ($cr.sets[$name].length === indexSET($cr.sets[$name], $item)) {
                                 if (!$cr.status[$name]) {
                                     addClass($cr.sets[$name], 'is-invalid');
-                                    $this.statusField($item, 'Поле обязательно для выбора');
+                                    $this.statusField($item);
                                 } else {
                                     removeClass($cr.sets[$name], 'is-invalid');
                                 }
@@ -89,15 +92,90 @@
                         default: {
                             if (!$item.value.length) {
                                 addClass($item, 'is-invalid');
-                                $this.statusField($item, 'Поле обязательно для заполнения');
+                                $this.statusField($item);
                             }
                         }
                     }
-                    
+
                 }
                 /* Сбор имён */
-                $this.names[$name] = $item.getAttribute('data-name') || null;
+                var $dataname;
+                if ($dataname = $item.getAttribute('data-name')) {
+                    $this.names[$name] = $dataname;
+                }
             });
+        },
+        /* Функция отправки */
+        send: function () {
+            var $this = this;
+            $this.checkFields();
+            if($this.error) return false;
+            
+            /* Дополняем форму */
+            var $formData = new FormData($this.form);
+            $formData.forEach(function (value, key) {
+                if (value.length === 0) {
+                    $formData.delete(key);
+                }
+            });
+            
+            $formData.append('fa_names', JSON.stringify($this.names));
+            
+            /* Индивидульная тема формы */
+            var $subject;
+            if ($subject = $this.form.getAttribute('data-formajax')) {
+                $formData.append('fa_subject', $subject);
+            }
+            
+            /* Индивидульный получатель формы */
+            var $to;
+            if ($to = $this.form.getAttribute('data-to')) {
+                $formData.append('fa_to', $to);
+            }
+            
+            /* Делаем запрос */
+            var $request = new XMLHttpRequest();
+            $request.open('POST', '//' + location.hostname + '/formajax/index.php', true);
+            $request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
+            $request.onload = function() {
+                var $resp = JSON.parse($request.responseText);
+                if ($request.status >= 200 && $request.status < 400) {
+                    /* Результат успешного запроса */
+                    var $type;
+                    if ($resp.status) {
+                        $type = 'success';
+                        $this.form.querySelectorAll('button,[type="button"],[type="submit"]')[0].setAttribute('disabled', '');
+                        var $target;
+                        if ($target = $this.form.getAttribute('data-target')) {
+                            $this.settings.yandexMetrika($target);
+                        }
+                        /* Закрытие popup */
+                        if (typeof(jQuery) !== 'undefined') {
+                            setTimeout(function(){
+                                /* FancyBox */
+                                if (typeof(jQuery.fancybox) !== 'undefined'){
+                                    jQuery.fancybox.close();
+                                }
+                                /* Bootstrap */
+                                if (typeof(jQuery.modal('hide')) !== 'undefined'){
+                                    jQuery('.modal').modal('hide');
+                                }
+                            }, 2000);
+                        }                            
+                    } else {
+                        $type = 'error';
+                    }
+                    $this.statusForm($resp.messages, $type);
+                } else {
+                    /* Ошибка запроса */
+                    $this.statusForm($resp, 'error');
+                }
+            };
+            $request.onerror = function($error) {
+                /* Прочие ошибки */
+                $this.statusForm($error.type, 'error');
+            };
+            $request.send($formData);
         }
     };
 
@@ -106,6 +184,9 @@
         e.preventDefault();
         $formajax.init(this);
     });
+    
+    /* Записываем источник трафика */
+    window.onload = $formajax.setReferrer(this);
     
     /* Отключаем стандартную валидацию HTML5 у наших форм */
     var DOMEvents = ['DOMSubtreeModified','DOMContentLoaded'];
@@ -180,120 +261,4 @@
             }
         }, false);
     }
-    
-    /*
-    
-    // Статус отправки 
-    
-    // Функция отправки
-    function flsend(e) {
-    
-        // обнуление набора
-        $flajax.options.required = [];
-        $flajax.options.names = {};
-        
-        var err = false,
-            allRequired = true,
-            form = e.closest('form');
-    
-        // Функция валидации
-        function flcheck(th) {
-            var type = th.attr('type');
-            if (type !== 'file') $flajax.options.required.push(th.attr('name'));
-        }
-    
-        form.find($flajax.typesfield).each(function() {
-            var th = $(this);
-            if (th.attr('required') !== undefined) {
-                allRequired = false;
-                flcheck(th);
-            }
-    
-            // Добавляем имена полей в отдельный массив
-            if (th.attr('type') !== 'file')
-            $flajax.options.names[th.attr('name')] = th.is('[data-FL-name]') ? th.attr('data-FL-name') : 'name="' + th.attr('name') + '"';
-    
-        });
-    
-        if (allRequired) {
-            form.find($flajax.typesfield).each(function() {
-                flcheck($(this));
-            });
-        }
-    
-        if (err) {
-            if (form.hasClass('cme')){
-                flstatus(form, 'error', $flajax.error);
-            }
-            return;
-        }
-    
-        flstatus(form, 'sending', $flajax.sending);
-    
-        var formData = new FormData(form[0]);
-    
-        // Источник трафика
-        var rf = getData('FLreferrer');
-        if (rf && rf.length > 0) {
-            formData.append('referrer', rf);
-            $flajax.options.names['referrer'] = $flajax.referrer;
-        }
-    
-        // Страница с запросом
-        formData.append('pageurl', location.href);
-        $flajax.options.names['pageurl'] = $flajax.pageurl;
-    
-        var FLyaM = e.attr('data-FL-yaM');
-    
-        $flajax.options.to = e.attr('data-FL-to');
-        $flajax.options.theme = e.attr('data-FL-theme');
-    
-        formData.append('options', JSON.stringify($flajax.options));
-        
-        $.ajax({
-            url: '/postflajax',
-            type: 'post',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(json) { console.log(json);
-                var items = form.find($flajax.typesfield);
-                items.removeClass('is-invalid');
-                if (json['status'] === false) {
-                    if (json['errors'].length !== 0) {
-                        var err_log = true;
-                        $.each(json['errors'], function(key, data) {
-                            if (err_log) {
-                                flstatus(form, 'error', data['required']);
-                                err_log = false;
-                            }
-                            items.filter('[name="' + key + '"]').addClass('is-invalid');
-                        });
-                    } else if (json['messages'].length !== 0) {
-                        flstatus(form, 'error', json['messages']);
-                    } else {
-                        flstatus(form, 'error', $flajax.fatal_error);
-                    }
-                } else {
-                    flstatus(form, 'sent', $flajax.sent);
-                    e.attr('disabled', 'disabled');
-                    setTimeout(function(){
-                        if (typeof($.fancybox) !== 'undefined'){
-                            $.fancybox.close();
-                        }
-                    }, 2000);
-                    if (FLyaM !== undefined) $flajax.yaMetrik(FLyaM);
-                }
-            },
-            error: function(status) {
-                console.log(status);
-            }
-        });
-    }
-    
-    function getData(e) {
-        return localStorage.getItem(e) || false;
-    }
-*/
 })();

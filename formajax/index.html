@@ -3,10 +3,10 @@
     <script src="formajax.js"></script>
 </head>
 <body>
-<form class="-visor-no-click" data-formajax>
+<form class="-visor-no-click" data-target="ЦЕЛЬ МЕТРИКИ" data-formajax="Индивидуальная тема" data-to="milkamil93@gmail.com,kamil@pandaworks.ru">
     <div>
         <label for="name">Ваше имя</label>
-        <input type="text" id="name" name="name" data-name="Имя"/>
+        <input type="text" id="name" name="name" data-name="Имя" data-error="Имя нужно заполнить" required/>
     </div>
     <div>
         <label for="phone">Ваш телефон</label>
@@ -39,7 +39,7 @@
     </div>
     <div>
         <p>
-            <label for="radio">Чекбокс</label>
+            <label for="checkbox">Чекбокс</label>
             <input type="checkbox" name="checkbox" id="checkbox" value="Чекбокс 1">
             <input type="checkbox" name="checkbox" value="Чекбокс 2">
             <input type="checkbox" name="checkbox" value="Чекбокс 3">
@@ -49,8 +49,8 @@
     </div>
     <div>
         <p>
-            <label for="radio">Селект</label>
-            <select>
+            <label>Селект</label>
+            <select name="select">
                 <option>Опция 1</option>
                 <option>Опция 2</option>
                 <option value="Option 3">Опция 3</option>

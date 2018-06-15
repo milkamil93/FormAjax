@@ -10,6 +10,8 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
+header('Content-Type: application/json');
+
 require 'phpmailer/class.smtp.php';
 require 'phpmailer/class.phpmailer.php';
 
@@ -18,16 +20,17 @@ class formajax {
     private $post;
     private $names;
     private $mail;
+    private $status = true;
 
     public function __construct () 
     {
-        $this->post = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
-        $this->names = isset($this->post['names']) ? json_decode($this->post['names'],1) : array();
-        unset($this->post['names']);
+        $this->post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
+        $this->names = isset($this->post['fa_names']) ? json_decode(str_replace('&#34;','"',$this->post['fa_names']),1) : array();
+        unset($this->post['fa_names']);
         $this->mail = new PHPMailer;
     }
     
-    private function setSettings ($settings, $subject, $smtp) 
+    private function setSettings ($subject, $fromname, $smtp) 
     {
         // Настройки SMTP
         if ($smtp) {
@@ -44,11 +47,11 @@ class formajax {
             // От кого пришло
             $host = parse_url('http://'.$_SERVER['HTTP_HOST']);
             $from = 'noreply@' . str_replace(array('http://','www.'),'',$host['host']);
-            $this->mail->setFrom($from);
+            $this->mail->setFrom($from,$fromname);
         }
         
         // Тема письма
-        $this->mail->Subject = isset($settings['subject']) ? $settings['subject'] : $subject;
+        $this->mail->Subject = $subject;
 
         // Тело письма
         $this->mail->isHTML(true);
@@ -61,8 +64,10 @@ class formajax {
         if (count($this->post)) {
             $data .= '<div style="background:#f7fbff;border:1px solid #e5e5e5;padding:5px 15px;">';
             foreach ($this->post as $key => $item) {
-                $name = $this->names[$key] OR $key;
-                $data .= '<p><strong>' . $name . ':</strong> ' . $item . '<br/></p>';
+                if ($item) {
+                    $name = isset($this->names[$key]) ? $this->names[$key] : $key;
+                    $data .= '<p><strong>' . $name . ':</strong> ' . $item . '<br/></p>';
+                }
             }
             $data .= '</div>';
         }
@@ -86,27 +91,33 @@ class formajax {
     }
 
 
-    public function send ($to = null, $subject = 'Обратный звонок', $smtp = null) 
+    public function send ($to = null, $subject = 'Обратный звонок', $fromname = null, $smtp = null) 
     {
-        $settings = isset($this->post['settings']) ? json_decode($this->post['settings'],1) : array();
-        $to = isset($settings['to']) ? $settings['to'] : $to;
-        unset($this->post['settings']);
+        $subject = isset($this->post['fa_subject']) ? $this->post['fa_subject'] : $subject;
+        unset($this->post['fa_subject']);
+        $to = isset($this->post['fa_to']) ? $this->post['fa_to'] : $to;
+        unset($this->post['fa_to']);
         if ($to) {
             foreach (explode(',', $to) as $item) {
                 $this->mail->addAddress(trim($item));
             }
-            $this->setSettings($settings, $subject, $smtp);
+            $this->setSettings($subject, $fromname, $smtp);
             $this->getFiles();
             if (!$this->mail->send()) {
                 $out = $this->mail->ErrorInfo;
+                $this->status = false;
             } else {
                 $out = 'Сообщение отправлено';
             }
         } else {
             $out = 'Укажите адрес получателя!';
+            $this->status = false;
         }
         
-        return $out;
+        return json_encode(array(
+            'messages' => $out,
+            'status' => $this->status
+        ), JSON_UNESCAPED_UNICODE);
     }
 
 }
