@@ -49,6 +49,7 @@ class formajax {
             $from = 'noreply@' . str_replace(array('http://','www.'),'',$host['host']);
             $this->mail->setFrom($from,$fromname);
         }
+        $this->mail->CharSet = 'utf-8';
         
         // Тема письма
         $this->mail->Subject = $subject;

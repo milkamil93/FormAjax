@@ -157,7 +157,7 @@
                                     jQuery.fancybox.close();
                                 }
                                 /* Bootstrap */
-                                if (typeof(jQuery.modal('hide')) !== 'undefined'){
+                                if (typeof(jQuery.modal) !== 'undefined'){
                                     jQuery('.modal').modal('hide');
                                 }
                             }, 2000);
