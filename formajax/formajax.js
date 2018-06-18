@@ -27,33 +27,41 @@
             this.error = false;
             this.send();
         },
+        
         /* Записать источник трафика */
         setReferrer: function () {
             if(!this.getReferrer() && (document.referrer)) {
                 localStorage.setItem('formajax_Referrer', document.referrer);
             }
         },
+        
         /* Получить источник трафика */
         getReferrer: function () {
             return localStorage.getItem('formajax_Referrer') || false;
         },
+        
         /* Вывести статус формы */
         statusForm: function ($text, $status) {
             if ($text) {
                 $status = $status || 'warning';
                 var $alert = this.form.getElementsByClassName('alert');
                 if ($alert.length) {
-                    $alert[0].parentNode.removeChild($alert[0]);
+                    $alert[0].setAttribute('class', 'alert alert-' + $status);
+                    $alert[0].textContent = $text;
+                } else {
+                    this.form.insertBefore(createEl('div','alert alert-' + $status, $text), this.form.firstChild);
                 }
-                this.form.insertBefore(createEl('div','alert alert-' + $status, $text), this.form.firstChild);
+                
             }
         },
+        
         /* Вывести ошибку поля */
         statusField: function ($el) {
             this.error = true;
             var $msg = $el.getAttribute('data-error') || 'Поле обязательно для выбора';
             $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $msg + '</div>');
         },
+        
         /* Проверка полей на валидность, подготовка формы к отправке */
         checkFields: function () {
             var $fields = this.form.querySelectorAll(this.typefileds),
@@ -72,8 +80,10 @@
                     removeClass($item, 'is-invalid');
                 }
                 if (!$allRequired || $item.getAttribute('required') !== null) {
+                    
                     /* Сбор ошибок */
                     switch ($type) {
+                        
                         /* Проверка checkbox и radio полей на выбранность */
                         case 'checkbox':
                         case 'radio': {
@@ -98,6 +108,7 @@
                     }
 
                 }
+                
                 /* Сбор имён */
                 var $dataname;
                 if ($dataname = $item.getAttribute('data-name')) {
@@ -105,6 +116,7 @@
                 }
             });
         },
+        
         /* Функция отправки */
         send: function () {
             var $this = this;
@@ -146,6 +158,7 @@
             $request.onload = function() {
                 var $resp = JSON.parse($request.responseText);
                 if ($request.status >= 200 && $request.status < 400) {
+                    
                     /* Результат успешного запроса */
                     var $type;
                     if ($resp.status) {
@@ -155,13 +168,16 @@
                         if ($target = $this.form.getAttribute('data-target')) {
                             $this.settings.yandexMetrika($target);
                         }
+                        
                         /* Закрытие popup */
                         if (typeof(jQuery) !== 'undefined') {
                             setTimeout(function(){
+                                
                                 /* FancyBox */
                                 if (typeof(jQuery.fancybox) !== 'undefined'){
                                     jQuery.fancybox.close();
                                 }
+                                
                                 /* Bootstrap */
                                 if (typeof(jQuery.modal) !== 'undefined'){
                                     jQuery('.modal').modal('hide');
@@ -173,11 +189,13 @@
                     }
                     $this.statusForm($resp.messages, $type);
                 } else {
+                    
                     /* Ошибка запроса */
                     $this.statusForm($resp, 'error');
                 }
             };
             $request.onerror = function($error) {
+                
                 /* Прочие ошибки */
                 $this.statusForm($error.type, 'error');
             };
