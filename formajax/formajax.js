@@ -144,7 +144,6 @@
             $request.open('POST', '//' + location.hostname + '/formajax/index.php', true);
             $request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
             $request.onload = function() {
-                alert($request.responseText);
                 var $resp = JSON.parse($request.responseText);
                 if ($request.status >= 200 && $request.status < 400) {
                     /* Результат успешного запроса */
