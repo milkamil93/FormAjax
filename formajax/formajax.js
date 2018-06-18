@@ -111,14 +111,20 @@
             $this.checkFields();
             if($this.error) return false;
             
-            /* Дополняем форму */
-            var $formData = new FormData($this.form);
-            $formData.forEach(function (value, key) {
-                if (value.length === 0) {
-                    $formData.delete(key);
+            var $formData = new FormData($this.form),
+                $toDelete = [];
+            
+            /* Удаляем пустые поля */
+            $formData.forEach(function ($value, $key) {
+                if (typeof $value === 'object' && $value.size === 0 || $value.length === 0) {
+                    $toDelete.push($key);
                 }
             });
+            $toDelete.forEach(function ($value) {
+                $formData.delete($value);
+            });
             
+            /* Набор идентификаторов */
             $formData.append('fa_names', JSON.stringify($this.names));
             
             /* Индивидульная тема формы */
@@ -138,6 +144,7 @@
             $request.open('POST', '//' + location.hostname + '/formajax/index.php', true);
             $request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
             $request.onload = function() {
+                alert($request.responseText);
                 var $resp = JSON.parse($request.responseText);
                 if ($request.status >= 200 && $request.status < 400) {
                     /* Результат успешного запроса */

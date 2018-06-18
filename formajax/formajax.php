@@ -10,8 +10,6 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-header('Content-Type: application/json');
-
 require 'phpmailer/class.smtp.php';
 require 'phpmailer/class.phpmailer.php';
 
@@ -98,7 +96,7 @@ class formajax {
         unset($this->post['fa_subject']);
         $to = isset($this->post['fa_to']) ? $this->post['fa_to'] : $to;
         unset($this->post['fa_to']);
-        if ($to) {
+        if ($to && $to !== 'to@to.to') {
             foreach (explode(',', $to) as $item) {
                 $this->mail->addAddress(trim($item));
             }
