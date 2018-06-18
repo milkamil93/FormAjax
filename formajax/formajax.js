@@ -150,6 +150,8 @@
             if ($to = $this.form.getAttribute('data-to')) {
                 $formData.append('fa_to', $to);
             }
+
+            $this.statusForm('Отправка сообщения', 'warning');
             
             /* Делаем запрос */
             var $request = new XMLHttpRequest();
