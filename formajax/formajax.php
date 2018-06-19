@@ -40,7 +40,7 @@ class formajax {
             $this->mail->Password = $smtp['password'];
             $this->mail->SMTPSecure = 'ssl';
             $this->mail->Port = 465;
-            $this->mail->setFrom($smtp['username']);
+            $this->mail->setFrom($smtp['username'],$fromname);
         } else {
             // От кого пришло
             $host = parse_url('http://'.$_SERVER['HTTP_HOST']);
