@@ -187,19 +187,19 @@
                             }, 2000);
                         }                            
                     } else {
-                        $type = 'error';
+                        $type = 'danger';
                     }
                     $this.statusForm($resp.messages, $type);
                 } else {
                     
                     /* Ошибка запроса */
-                    $this.statusForm($resp, 'error');
+                    $this.statusForm($resp, 'danger');
                 }
             };
             $request.onerror = function($error) {
                 
                 /* Прочие ошибки */
-                $this.statusForm($error.type, 'error');
+                $this.statusForm($error.type, 'danger');
             };
             $request.send($formData);
         }
