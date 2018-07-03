@@ -14,21 +14,23 @@ require 'phpmailer/class.smtp.php';
 require 'phpmailer/class.phpmailer.php';
 
 class formajax {
-    const VERSION = '0.1.1';
+
+    const VERSION = '1.0.0';
     private $post;
     private $names;
     private $mail;
+    private $error = null;
     private $status = true;
 
-    public function __construct () 
+    public function __construct ()
     {
         $this->post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
         $this->names = isset($this->post['fa_names']) ? json_decode(str_replace('&#34;','"',$this->post['fa_names']),1) : array();
         unset($this->post['fa_names']);
         $this->mail = new PHPMailer;
     }
-    
-    private function setSettings ($subject, $fromname, $smtp) 
+
+    private function setSettings ($subject, $fromname, $smtp)
     {
         // Настройки SMTP
         if ($smtp) {
@@ -48,7 +50,7 @@ class formajax {
             $this->mail->setFrom($from,$fromname);
         }
         $this->mail->CharSet = 'utf-8';
-        
+
         // Тема письма
         $this->mail->Subject = $subject;
 
@@ -57,7 +59,7 @@ class formajax {
         $this->mail->Body = $this->getBody();
     }
 
-    private function getBody () 
+    private function getBody ()
     {
         $data = '';
         if (count($this->post)) {
@@ -71,26 +73,40 @@ class formajax {
             $data .= '</div>';
         }
         $data .= '<div style="background:#f5f5f5;border:1px solid #e5e5e5;padding:10px 15px;margin: 10px 0;">
-            IP: ' . $_SERVER['REMOTE_ADDR'] . 
-        '</div>';
+            IP: ' . $_SERVER['REMOTE_ADDR'] .
+            '</div>';
         return $data;
     }
 
-    private function getFiles () 
+    private function addAttach ($tmp_name, $name, $size)
+    {
+        if ($size >= 10485760) { // 10 МБ
+            $this->error = 'Слишком большой размер файла';
+            return false;
+        } else {
+            $this->mail->AddAttachment($tmp_name, $name);
+            return true;
+        }
+    }
+
+    private function getFiles ()
     {
         foreach ($_FILES as $item) {
             if (is_array($item['name'])) {
                 foreach ($item['name'] as $i => $name) {
-                    $this->mail->AddAttachment($item['tmp_name'][$i], $name);
+                    if (!$this->addAttach($item['tmp_name'][$i], $name, $item['size'][$i])) {
+                        break;
+                    }
                 }
             } else {
-                $this->mail->AddAttachment($item['tmp_name'], $item['name']);
+                if (!$this->addAttach($item['tmp_name'], $item['name'], $item['size'])) {
+                    break;
+                }
             }
         }
     }
 
-
-    public function send ($to = null, $subject = 'Обратный звонок', $fromname = null, $smtp = null) 
+    public function send ($to = null, $subject = 'Обратный звонок', $fromname = null, $smtp = null)
     {
         $subject = isset($this->post['fa_subject']) ? $this->post['fa_subject'] : $subject;
         unset($this->post['fa_subject']);
@@ -102,7 +118,10 @@ class formajax {
             }
             $this->setSettings($subject, $fromname, $smtp);
             $this->getFiles();
-            if (!$this->mail->send()) {
+            if ($this->error) {
+                $out = $this->error;
+                $this->status = false;
+            } elseif (!$this->mail->send()) {
                 $out = $this->mail->ErrorInfo;
                 $this->status = false;
             } else {
@@ -112,7 +131,7 @@ class formajax {
             $out = 'Укажите адрес получателя!';
             $this->status = false;
         }
-        
+
         return json_encode(array(
             'messages' => $out,
             'status' => $this->status

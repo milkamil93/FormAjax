@@ -17,7 +17,7 @@
             //yaCounter47027148.reachGoal(TARGET);
         }
     };
-    
+
     var $formajax = {
         init: function ($form) {
             this.form = $form;
@@ -27,19 +27,19 @@
             this.error = false;
             this.send();
         },
-        
+
         /* Записать источник трафика */
         setReferrer: function () {
             if(!this.getReferrer() && (document.referrer)) {
                 localStorage.setItem('formajax_Referrer', document.referrer);
             }
         },
-        
+
         /* Получить источник трафика */
         getReferrer: function () {
             return localStorage.getItem('formajax_Referrer') || false;
         },
-        
+
         /* Вывести статус формы */
         statusForm: function ($text, $status) {
             if ($text) {
@@ -51,17 +51,17 @@
                 } else {
                     this.form.insertBefore(createEl('div','alert alert-' + $status, $text), this.form.firstChild);
                 }
-                
+
             }
         },
-        
+
         /* Вывести ошибку поля */
         statusField: function ($el) {
             this.error = true;
             var $msg = $el.getAttribute('data-error') || 'Поле обязательно для выбора';
             $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $msg + '</div>');
         },
-        
+
         /* Проверка полей на валидность, подготовка формы к отправке */
         checkFields: function () {
             var $fields = this.form.querySelectorAll(this.typefileds),
@@ -80,10 +80,10 @@
                     removeClass($item, 'is-invalid');
                 }
                 if (!$allRequired || $item.getAttribute('required') !== null) {
-                    
+
                     /* Сбор ошибок */
                     switch ($type) {
-                        
+
                         /* Проверка checkbox и radio полей на выбранность */
                         case 'checkbox':
                         case 'radio': {
@@ -108,7 +108,7 @@
                     }
 
                 }
-                
+
                 /* Сбор имён */
                 var $dataname;
                 if ($dataname = $item.getAttribute('data-name')) {
@@ -116,51 +116,57 @@
                 }
             });
         },
-        
+
         /* Функция отправки */
         send: function () {
             var $this = this;
             $this.checkFields();
             if($this.error) return false;
-            
+
             var $formData = new FormData($this.form),
                 $toDelete = [];
-            
+
             /* Удаляем пустые поля */
             $formData.forEach(function ($value, $key) {
                 if (typeof $value === 'object' && $value.size === 0 || $value.length === 0) {
                     $toDelete.push($key);
                 }
+                if (typeof $value === 'object' && $value.size >= 10485760) { // 10 МБ
+                    $this.statusForm('Слишком большой размер файла', 'danger');
+                    $this.error = true;
+                }
             });
             $toDelete.forEach(function ($value) {
                 $formData.delete($value);
             });
-            
+
             /* Набор идентификаторов */
             $formData.append('fa_names', JSON.stringify($this.names));
-            
+
             /* Индивидульная тема формы */
             var $subject;
             if ($subject = $this.form.getAttribute('data-formajax')) {
                 $formData.append('fa_subject', $subject);
             }
-            
+
             /* Индивидульный получатель формы */
             var $to;
             if ($to = $this.form.getAttribute('data-to')) {
                 $formData.append('fa_to', $to);
             }
 
+            if($this.error) return false;
+
             $this.statusForm('Отправка сообщения', 'warning');
-            
+
             /* Делаем запрос */
             var $request = new XMLHttpRequest();
-            $request.open('POST', '//' + location.hostname + '/formajax/index.php', true);
+            $request.open('POST', '/XMLHttpRequestForm', true);
             $request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
             $request.onload = function() {
                 var $resp = JSON.parse($request.responseText);
                 if ($request.status >= 200 && $request.status < 400) {
-                    
+
                     /* Результат успешного запроса */
                     var $type;
                     if ($resp.status) {
@@ -170,34 +176,34 @@
                         if ($target = $this.form.getAttribute('data-target')) {
                             $this.settings.yandexMetrika($target);
                         }
-                        
+
                         /* Закрытие popup */
                         if (typeof(jQuery) !== 'undefined') {
                             setTimeout(function(){
-                                
+
                                 /* FancyBox */
                                 if (typeof(jQuery.fancybox) !== 'undefined'){
                                     jQuery.fancybox.close();
                                 }
-                                
+
                                 /* Bootstrap */
                                 if (typeof(jQuery.modal) !== 'undefined'){
                                     jQuery('.modal').modal('hide');
                                 }
                             }, 2000);
-                        }                            
+                        }
                     } else {
                         $type = 'danger';
                     }
                     $this.statusForm($resp.messages, $type);
                 } else {
-                    
+
                     /* Ошибка запроса */
                     $this.statusForm($resp, 'danger');
                 }
             };
             $request.onerror = function($error) {
-                
+
                 /* Прочие ошибки */
                 $this.statusForm($error.type, 'danger');
             };
@@ -210,10 +216,10 @@
         e.preventDefault();
         $formajax.init(this);
     });
-    
+
     /* Записываем источник трафика */
     window.onload = $formajax.setReferrer(this);
-    
+
     /* Отключаем стандартную валидацию HTML5 у наших форм */
     var DOMEvents = ['DOMSubtreeModified','DOMContentLoaded'];
     for (var i = 0; i < DOMEvents.length; i++) {
@@ -223,7 +229,7 @@
             });
         });
     }
-    
+
     function indexSET($set, $el) {
         var $number = 0;
         $set.forEach(function ($item, i) {
@@ -233,14 +239,14 @@
         });
         return $number;
     }
-    
+
     function createEl(tag, className, text) {
         var el = document.createElement(tag);
         el.className = className;
         el.innerHTML = text;
         return el;
     }
-    
+
     function addClass(el, className) {
         if (el.length) {
             el.forEach(function ($item) {
@@ -257,7 +263,7 @@
             }
         }
     }
-    
+
     function removeClass(el, className) {
         if (el.length) {
             el.forEach(function ($item) {
@@ -273,7 +279,7 @@
                 el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
             }
         }
-        
+
     }
 
     var is = function(el, selector) {
