@@ -9,7 +9,7 @@
     var $settings = {
         empty: 'Заполните необходимые поля',
         fatal: 'Неизвестная ошибка',
-        sending: 'Идёт отправка',
+        sending: 'Отправка сообщения',
         requestpage: 'Страница с запросом',
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
@@ -157,7 +157,8 @@
 
             if($this.error) return false;
 
-            $this.statusForm('Отправка сообщения', 'warning');
+
+            $this.statusForm($settings.sending, 'warning');
 
             /* Делаем запрос */
             var $request = new XMLHttpRequest();
