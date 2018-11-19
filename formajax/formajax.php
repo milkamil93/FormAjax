@@ -106,7 +106,7 @@ class formajax {
         }
     }
 
-    public function send ($to = null, $subject = 'Обратный звонок', $fromname = null, $smtp = null)
+    public function send ($to = null, $subject = 'Обратный звонок', $fromname = null, $smtp = null, $callback = null)
     {
         $subject = isset($this->post['fa_subject']) ? $this->post['fa_subject'] : $subject;
         unset($this->post['fa_subject']);
@@ -126,6 +126,9 @@ class formajax {
                 $this->status = false;
             } else {
                 $out = 'Сообщение отправлено';
+                if ($callback) {
+                    $callback[0]($this->post);
+                }
             }
         } else {
             $out = 'Укажите адрес получателя!';

@@ -18,12 +18,14 @@ if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'
             echo (new formajax())->send(
                 'to@to.to',
                 'Тема письма',
-                'Имя'
+                'Имя',
             /*array(
                 'host' => 'smtp.yandex.ru',
                 'username' => '@yandex.ru',
                 'password' => ''
             )*/
+            null, // smtp
+            null // callback (array(function() { return }))
             );
             break;
         }
