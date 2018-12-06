@@ -140,6 +140,12 @@
                 $formData.delete($value);
             });
 
+            /* Источник трафика и страница с запросом */
+            $this.names.fa_requestpage = $settings.requestpage;
+            $this.names.fa_referrer = $settings.referrer;
+            $formData.append('fa_requestpage', location.href);
+            $formData.append('fa_referrer', $this.getReferrer());
+
             /* Набор идентификаторов */
             $formData.append('fa_names', JSON.stringify($this.names));
 
