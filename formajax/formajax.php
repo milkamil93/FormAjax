@@ -72,7 +72,8 @@ class formajax {
             }
             $data .= '</div>';
         }
-        $data .= '<div style="background:#f5f5f5;border:1px solid #e5e5e5;padding:10px 15px;margin: 10px 0;">IP: ' . $_SERVER['REMOTE_ADDR'] . '</div>';
+        $data .= '<div style="background:#f5f5f5;border:1px solid #e5e5e5;padding:10px 15px;margin:10px 0;font-size:80%;">IP: ' . $_SERVER['REMOTE_ADDR'] . '<br/> Referer: ' . $_SERVER['HTTP_REFERER'] . '<br/> UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '</div>';
+        $this->post['IP'] = $_SERVER['REMOTE_ADDR'];
         return $data;
     }
 
