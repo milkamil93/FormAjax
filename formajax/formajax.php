@@ -24,7 +24,7 @@ class formajax {
 
     public function __construct ()
     {
-        $this->post = filter_input_array(INPUT_POST,['filter'=>FILTER_SANITIZE_STRING]);
+        $this->post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
         $this->names = isset($this->post['fa_names']) ? json_decode(str_replace('&#34;','"',$this->post['fa_names']),1) : array();
         unset($this->post['fa_names']);
         $this->mail = new PHPMailer;
