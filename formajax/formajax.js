@@ -111,7 +111,7 @@
 
                 /* Сбор имён */
                 var $dataname;
-                if ($dataname = $item.getAttribute('data-name')) {
+                if (($dataname = $item.getAttribute('data-name'))) {
                     $this.names[$name] = $dataname;
                 }
             });
@@ -151,13 +151,13 @@
 
             /* Индивидульная тема формы */
             var $subject;
-            if ($subject = $this.form.getAttribute('data-formajax')) {
+            if (($subject = $this.form.getAttribute('data-formajax'))) {
                 $formData.append('fa_subject', $subject);
             }
 
             /* Индивидульный получатель формы */
             var $to;
-            if ($to = $this.form.getAttribute('data-to')) {
+            if (($to = $this.form.getAttribute('data-to'))) {
                 $formData.append('fa_to', $to);
             }
 
@@ -180,7 +180,7 @@
                         $type = 'success';
                         $this.form.querySelectorAll('button,[type="button"],[type="submit"]')[0].setAttribute('disabled', '');
                         var $target;
-                        if ($target = $this.form.getAttribute('data-target')) {
+                        if (($target = $this.form.getAttribute('data-target'))) {
                             $this.settings.yandexMetrika($target);
                         }
 
