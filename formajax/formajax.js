@@ -185,17 +185,17 @@
                         }
 
                         /* Закрытие popup */
-                        if (typeof(jQuery) !== 'undefined') {
+                        if (typeof($) !== 'undefined') {
                             setTimeout(function(){
 
                                 /* FancyBox */
                                 if (typeof(jQuery.fancybox) !== 'undefined'){
-                                    jQuery.fancybox.close();
+                                    $.fancybox.close();
                                 }
 
                                 /* Bootstrap */
                                 if (typeof(jQuery.modal) !== 'undefined'){
-                                    jQuery('.modal').modal('hide');
+                                    $('.modal').modal('hide');
                                 }
                             }, 2000);
                         }
