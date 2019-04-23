@@ -22,7 +22,7 @@
         init: function ($form) {
             this.form = $form;
             this.settings = $settings;
-            this.typefileds = 'input:not([type="button"]):not([type="hidden"]):not([type="image"]):not([type="password"]):not([type="reset"]):not([type="submit"]),textarea,select';
+            this.typefileds = 'input:not([type="button"]):not([type="image"]):not([type="password"]):not([type="reset"]):not([type="submit"]),textarea,select';
             this.names = {};
             this.error = false;
             this.send();
