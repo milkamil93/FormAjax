@@ -131,7 +131,7 @@ class formajax {
             } else {
                 $out = 'Сообщение отправлено';
                 if ($callback) {
-                    $callback[0]($this->post);
+                    call_user_func($callback, $this->post);
                 }
             }
         } else {

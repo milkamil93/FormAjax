@@ -19,15 +19,19 @@ if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'
                 'to@to.to',
                 'Тема письма',
                 'Имя',
+
+                // smtp
                 /*array(
                     'host' => 'smtp.yandex.ru',
                     'username' => '@yandex.ru',
                     'password' => ''
                 )*/
-                null, // smtp
-                (array(function($fields) {
+                null,
+
+                // callback после успешной отправки
+                function($fields) {
                     return $fields;
-                }))
+                }
             );
             break;
         }
