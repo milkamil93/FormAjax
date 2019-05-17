@@ -14,7 +14,12 @@
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
         yandexMetrika: function (TARGET) {
+
+            // старая метрика
             //yaCounter47027148.reachGoal(TARGET);
+
+            // новая метрика
+            //ym(47027148, 'reachGoal', TARGET);
         }
     };
 
