@@ -63,7 +63,7 @@
         /* Вывести ошибку поля */
         statusField: function ($el) {
             this.error = true;
-            var $msg = $el.getAttribute('data-error') || 'Поле обязательно для выбора';
+            var $msg = $el.getAttribute('data-error') || 'Поле обязательно для заполнения';
             $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $msg + '</div>');
         },
 
