@@ -194,12 +194,12 @@
                             setTimeout(function(){
 
                                 /* FancyBox */
-                                if (typeof(jQuery.fancybox) !== 'undefined'){
+                                if (typeof($.fancybox) !== 'undefined'){
                                     $.fancybox.close();
                                 }
 
                                 /* Bootstrap */
-                                if (typeof(jQuery.modal) !== 'undefined'){
+                                if (typeof($.modal) !== 'undefined'){
                                     $('.modal').modal('hide');
                                 }
                             }, 2000);
