@@ -64,7 +64,15 @@
         statusField: function ($el) {
             this.error = true;
             var $msg = $el.getAttribute('data-error') || 'Поле обязательно для заполнения';
-            $el.insertAdjacentHTML('afterend', '<div class="invalid-feedback">' + $msg + '</div>');
+            var inputInvalid = document.createElement('div');
+            inputInvalid.className = 'invalid-feedback';
+            inputInvalid.innerText = $msg;
+            $el.after(inputInvalid);
+            inputInvalid.addEventListener('mouseover', () => {
+                $el.classList.remove('is-invalid');
+                $el.focus();
+                inputInvalid.remove();
+            });
         },
 
         /* Проверка полей на валидность, подготовка формы к отправке */
@@ -173,7 +181,7 @@
 
             /* Делаем запрос */
             var $request = new XMLHttpRequest();
-            $request.open('POST', '/XMLHttpRequestForm', true);
+            $request.open('POST', 'XMLHttpRequestForm', true);
             $request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
             $request.onload = function() {
                 var $resp = JSON.parse($request.responseText);
