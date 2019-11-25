@@ -7,6 +7,7 @@
 
 ;(function () {
     var settings = {
+        phpScript: '__ajax__/form', // ссылка до обработчика
         empty: 'Заполните необходимые поля',
         fatal: 'Неизвестная ошибка',
         sending: 'Отправка сообщения',
