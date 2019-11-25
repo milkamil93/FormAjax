@@ -307,7 +307,7 @@
 
     function is(el, selector) {
         return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
-    };
+    }
 
     function addEvent(parent, evt, selector, handler) {
         parent.addEventListener(evt, function(event) {
