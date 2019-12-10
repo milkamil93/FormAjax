@@ -12,6 +12,7 @@
         fatal: 'Неизвестная ошибка',
         sending: 'Отправка сообщения',
         requestPage: 'Страница с запросом',
+        filesMaxCount: 'Максимум {+count+} файла(ов)',
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
         callback: function (form) {
@@ -112,6 +113,20 @@
                                     self.statusField(item);
                                 } else {
                                     removeClass(cr.sets[name], 'is-invalid');
+                                }
+                            }
+                            break;
+                        }
+                        case 'file': {
+                            var maxCount = 0;
+                            if ((maxCount = item.getAttribute('data-max-count'))) {
+                                if (item.files.length > maxCount) {
+                                    self.statusForm(
+                                        parseString(settings.filesMaxCount, {
+                                            'count': item.files.length
+                                        }),
+                                        'danger'
+                                    );
                                 }
                             }
                             break;
@@ -271,38 +286,36 @@
     }
 
     function addClass(el, className) {
-        if (el.length) {
+        if (el.length && el.nodeName !== 'SELECT') {
             el.forEach(function (item) {
-                addCl(item);
+                addCl(item, className);
             });
         } else {
-            addCl(el);
-        }
-        function addCl(el) {
-            if (el.classList) {
-                el.classList.add(className);
-            } else {
-                el.className += ' ' + className;
-            }
+            addCl(el, className);
         }
     }
 
+    function addCl(el, className) {
+        if (el.classList) el.classList.add(className);
+        else el.className += ' ' + className;
+    }
+
     function removeClass(el, className) {
-        if (el.length) {
+        if (el.length && el.nodeName !== 'SELECT') {
             el.forEach(function (item) {
-                removeCl(item);
+                removeCl(item, className);
             });
         } else {
-            removeCl(el);
+            removeCl(el, className);
         }
-        function removeCl(el) {
-            if (el.classList) {
-                el.classList.remove(className);
-            } else {
-                el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
-            }
-        }
+    }
 
+    function removeCl(el, className) {
+        if (el.classList) {
+            el.classList.remove(className);
+        } else {
+            el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+        }
     }
 
     function is(el, selector) {
@@ -315,5 +328,15 @@
                 handler.apply(event.target.closest(selector), arguments);
             }
         }, false);
+    }
+
+    function parseString(string, data) {
+        return string.replace(/\{\+([\w\.]*)\+}/g, function(str, key) {
+            var keys = key.split('.'), value = data[keys.shift()];
+            [].slice.call(keys).forEach(function() {
+                value = value[this];
+            });
+            return (value === null || value === undefined) ? '' : value;
+        });
     }
 })();
