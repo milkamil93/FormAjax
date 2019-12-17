@@ -52,6 +52,7 @@ class formajax {
             // От кого пришло
             $host = parse_url('http://'.$_SERVER['HTTP_HOST']);
             $from = 'noreply@' . str_replace(array('http://','www.'),'',$host['host']);
+            $this->mail->AddCustomHeader("List-Unsubscribe: <mailto:{$from}?subject=Unsubscribe>");
             $this->mail->setFrom($from,$fromname);
         }
         $this->mail->CharSet = 'utf-8';
