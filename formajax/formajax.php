@@ -62,13 +62,14 @@ class formajax {
         // Тело письма
         $this->mail->isHTML(true);
         $this->mail->Body = $this->getBody();
+        $this->mail->AltBody = $this->getText();
     }
 
     private function getBody ()
     {
         $data = '';
         if (count($this->post)) {
-            $data .= '<div style="background:#f7fbff;border:1px solid #e5e5e5;padding:5px 15px;">';
+            $data .= '<html><body><div style="background:#f7fbff;border:1px solid #e5e5e5;padding:5px 15px;">';
             foreach ($this->post as $key => $item) {
                 if ($item) {
                     $name = isset($this->names[$key]) ? $this->names[$key] : $key;
@@ -77,8 +78,24 @@ class formajax {
             }
             $data .= '</div>';
         }
-        $data .= '<div style="background:#f5f5f5;border:1px solid #e5e5e5;padding:10px 15px;margin:10px 0;font-size:80%;">IP: ' . $_SERVER['REMOTE_ADDR'] . '<br/> Referer: ' . $_SERVER['HTTP_REFERER'] . '<br/> UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '</div>';
-        $this->post['IP'] = $_SERVER['REMOTE_ADDR'];
+        $data .= '<div style="background:#f5f5f5;border:1px solid #e5e5e5;padding:10px 15px;margin:10px 0;font-size:80%;">IP: ' . $_SERVER['REMOTE_ADDR'] . '<br/> Referer: ' . $_SERVER['HTTP_REFERER'] . '<br/> UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '</div></body></html>';
+        return $data;
+    }
+
+    private function getText()
+    {
+        $data = '';
+        if (count($this->post)) {
+            foreach ($this->post as $key => $item) {
+                if ($item) {
+                    $name = isset($this->names[$key]) ? $this->names[$key] : $key;
+                    $data .= $name . ': ' . $item . '; ' . PHP_EOL;
+                }
+            }
+        }
+        $data .= PHP_EOL . 'IP: ' . $_SERVER['REMOTE_ADDR'] . '; ' . PHP_EOL.
+            ' Referer: ' . $_SERVER['HTTP_REFERER'] . '; ' . PHP_EOL .
+            ' UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '; ';
         return $data;
     }
 
