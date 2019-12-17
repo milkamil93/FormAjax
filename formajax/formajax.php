@@ -94,8 +94,8 @@ class formajax {
             }
         }
         $data .= PHP_EOL . 'IP: ' . $_SERVER['REMOTE_ADDR'] . '; ' . PHP_EOL.
-            ' Referer: ' . $_SERVER['HTTP_REFERER'] . '; ' . PHP_EOL .
-            ' UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '; ';
+            'Referer: ' . $_SERVER['HTTP_REFERER'] . '; ' . PHP_EOL .
+            'UserAgent: ' . $_SERVER['HTTP_USER_AGENT'] . '; ';
         return $data;
     }
 
