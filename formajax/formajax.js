@@ -7,7 +7,7 @@
 
 ;(function () {
     var settings = {
-        phpScript: '__ajax__/form', // ссылка до обработчика
+        phpScript: 'formajax/index.php', // ссылка до обработчика
         empty: 'Заполните необходимые поля',
         fatal: 'Неизвестная ошибка',
         sending: 'Отправка сообщения',
@@ -200,7 +200,7 @@
 
             /* Делаем запрос */
             var request = new XMLHttpRequest();
-            request.open('POST', '__ajax__/form', true);
+            request.open('POST', settings.phpScript, true);
             request.setRequestHeader('X-REQUESTED-WITH', 'FormAjaxRequest');
             request.onload = function() {
                 var response = JSON.parse(request.responseText);
