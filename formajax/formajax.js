@@ -15,7 +15,7 @@
         filesMaxCount: 'Максимум {+count+} файла(ов)',
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
-        callback: function (form) {
+        callback: function (form, data) {
 
             /*var target;
             if ((target = form.getAttribute('data-target'))) {
@@ -156,7 +156,8 @@
             if(self.error) return false;
 
             var formData = new FormData(self.form),
-                toDelete = [];
+                toDelete = [],
+                formFields = {};
 
             /* Удаляем пустые поля */
             formData.forEach(function (value, key) {
@@ -167,6 +168,7 @@
                     self.statusForm('Слишком большой размер файла', 'danger');
                     self.error = true;
                 }
+                formFields[key] = value;
             });
             toDelete.forEach(function (value) {
                 formData.delete(value);
@@ -229,7 +231,7 @@
                         }
 
                         /* Функция после успешной отправки */
-                        self.settings.callback(self.form);
+                        self.settings.callback(self.form, formFields);
                     } else {
                         type = 'danger';
                     }
