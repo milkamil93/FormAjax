@@ -1,11 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: milkamil93
- * Date: 13.06.2018
- * Time: 12:24
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT License (MIT)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.gnu.org/copyleft/lesser.html
+ *
+ * @package   FormAjax
+ * @author    milkamil93
+ * @copyright 2018 FormAjax
+ * @license   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @link      https://github.com/milkamil93/FormAjax
  */
-
 require 'formajax.php';
 
 function not_request($error = null) {
