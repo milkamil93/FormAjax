@@ -22,10 +22,10 @@
         filesMaxCount: 'Максимум {+count+} файла(ов)',
         referrer: 'Источник трафика',
         sent: 'Сообщение отправлено',
-        callback: function (form, data) {
+        callback: function (fields) {
 
             /*var target;
-            if ((target = form.getAttribute('data-target'))) {
+            if ((target = this.form.getAttribute('data-target'))) {
                 // старая метрика
                 //yaCounter47027148.reachGoal(target);
 
@@ -38,7 +38,6 @@
     var formAjax = {
         init: function (form) {
             this.form = form;
-            this.settings = settings;
             this.typefileds = 'input:not([type="button"]):not([type="image"]):not([type="password"]):not([type="reset"]):not([type="submit"]),textarea,select';
             this.names = {};
             this.error = false;
@@ -238,7 +237,7 @@
                         }
 
                         /* Функция после успешной отправки */
-                        self.settings.callback(self.form, formFields);
+                        settings.callback.bind(self)(formFields);
                     } else {
                         type = 'danger';
                     }
@@ -255,6 +254,18 @@
                 self.statusForm(error.type, 'danger');
             };
             request.send(formData);
+        },
+
+        reset: function () {
+            this.form.reset();
+            this.form.querySelector('button,input[type="button"]').removeAttribute('disabled');
+            this.form.querySelectorAll('.is-invalid').forEach(function (item) {
+                item.classList.remove('is-invalid');
+            });
+            this.form.querySelector('.alert').remove();
+            this.form.querySelectorAll(this.typefileds).forEach(function (item) {
+                item.value = '';
+            });
         }
     };
 
