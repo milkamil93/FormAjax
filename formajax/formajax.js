@@ -197,9 +197,9 @@
             }
 
             /* Индивидульный получатель формы */
-            var $to;
-            if (($to = self.form.getAttribute('data-to'))) {
-                formData.append('fa_to', $to);
+            var to;
+            if ((to = self.form.getAttribute('data-to'))) {
+                formData.append('fa_to', to);
             }
 
             if(self.error) return false;
