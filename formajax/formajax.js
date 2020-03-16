@@ -14,14 +14,16 @@
  */
 ;(function () {
     var settings = {
-        phpScript: 'formajax/index.php', // ссылка до обработчика
-        empty: 'Заполните необходимые поля',
-        fatal: 'Неизвестная ошибка',
-        sending: 'Отправка сообщения',
-        requestPage: 'Страница с запросом',
-        filesMaxCount: 'Максимум {+count+} файла(ов)',
-        referrer: 'Источник трафика',
-        sent: 'Сообщение отправлено',
+        phpScript:      'formajax/index.php', // ссылка до обработчика
+        empty:          'Заполните необходимые поля',
+        fatal:          'Неизвестная ошибка',
+        sending:        'Отправка сообщения',
+        requestPage:    'Страница с запросом',
+        filesMaxCount:  'Максимум {+count+} файла(ов)',
+        referrer:       'Источник трафика',
+        sent:           'Сообщение отправлено',
+        reset:          true, // сбрасывать форму после отправки?
+
         callback: function (fields) {
 
             /*var target;
@@ -232,6 +234,12 @@
                                 /* Bootstrap */
                                 if (typeof($.modal) !== 'undefined'){
                                     $('.modal').modal('hide');
+                                }
+
+                                if (settings.reset) {
+                                    setTimeout(function () {
+                                        self.reset();
+                                    }, 500);
                                 }
                             }, 2000);
                         }
